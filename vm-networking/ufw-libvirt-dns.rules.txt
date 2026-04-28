@@ -1,0 +1,4 @@
+# Allow DNS from libvirt VMs to host (dnsmasq)
+
+sudo ufw allow in on virbr0 to 192.168.122.1 port 53 proto udp
+sudo ufw allow in on virbr0 to 192.168.122.1 port 53 proto tcp
