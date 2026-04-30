@@ -60,7 +60,7 @@ homelab/fail2ban
 Basic Fail2ban configuration and planned hardening.
 Main design principles
 Keep the host as clean as possible.
-Run services inside VMs or containers where it makes sense.
+Keep the host minimal; use VMs and containers for lab services instead of installing everything directly on the host.
 Keep public ports closed.
 Use Cloudflare Tunnel for external access.
 Route internal HTTP services through nginx.
