@@ -13,7 +13,7 @@ services:
     environment:
       POSTGRES_DB: guacamole_db
       POSTGRES_USER: zryty
-      POSTGRES_PASSWORD: CHANGE_ME
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql:ro
       - ./data:/var/lib/postgresql/data
@@ -29,7 +29,7 @@ services:
       POSTGRESQL_HOSTNAME: postgres
       POSTGRESQL_DATABASE: guacamole_db
       POSTGRESQL_USER: zryty
-      POSTGRESQL_PASSWORD: CHANGE_ME
+      POSTGRESQL_PASSWORD: ${POSTGRES_PASSWORD}
     depends_on:
       - guacd
       - postgres
