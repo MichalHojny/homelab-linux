@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+
+cat > /opt/company-backend/requirements.txt <<'EOF'
+fastapi
+uvicorn

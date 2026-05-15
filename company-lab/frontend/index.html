@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>ZrytyBeret IT Operations Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">ZB</div>
+      <div>
+        <strong>ZrytyBeret IT</strong>
+        <span>Operations Portal</span>
+      </div>
+    </div>
+
+    <nav class="side-nav">
+      <a href="#dashboard">Dashboard</a>
+      <a href="#services">Services</a>
+      <a href="#tickets">Tickets</a>
+      <a href="#assets">Assets</a>
+      <a href="#servers">Servers</a>
+      <a href="#changes">Changes</a>
+      <a href="#audit">Audit Log</a>
+      <a href="/docs" target="_blank">API Docs</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span>Frontend: srv-02/nginx</span>
+      <span>Backend: srv-01/FastAPI</span>
+      <span>Database: SQLite</span>
+    </div>
+  </aside>
+
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Homelab · production-like internal portal</p>
+        <h1>IT Operations Dashboard</h1>
+      </div>
+
+      <div class="top-actions">
+        <span id="api-status" class="pill pill-warn">checking API...</span>
+        <button id="refresh-all">Refresh</button>
+      </div>
+    </header>
+
+    <section id="dashboard" class="section">
+      <div class="section-header">
+        <div>
+          <h2>Dashboard</h2>
+          <p>Live summary from srv-01 backend through srv-02 nginx reverse proxy.</p>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <article class="kpi-card">
+          <span>Employees</span>
+          <strong id="employees-count">--</strong>
+        </article>
+
+        <article class="kpi-card">
+          <span>Open tickets</span>
+          <strong id="open-tickets-count">--</strong>
+        </article>
+
+        <article class="kpi-card">
+          <span>Critical tickets</span>
+          <strong id="critical-tickets-count">--</strong>
+        </article>
+
+        <article class="kpi-card">
+          <span>Assets</span>
+          <strong id="assets-count">--</strong>
+        </article>
+
+        <article class="kpi-card">
+          <span>Servers online</span>
+          <strong id="servers-online-count">--</strong>
+        </article>
+
+        <article class="kpi-card">
+          <span>Services</span>
+          <strong id="services-count">--</strong>
+        </article>
+
+        <article class="kpi-card">
+          <span>Open changes</span>
+          <strong id="open-changes-count">--</strong>
+        </article>
+
+        <article class="kpi-card">
+          <span>Environment</span>
+          <strong>LAB</strong>
+        </article>
+      </div>
+    </section>
+
+    <section id="services" class="section">
+      <div class="section-header">
+        <div>
+          <h2>Service Health</h2>
+          <p>Internal service inventory for the homelab environment.</p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Service</th>
+              <th>Host</th>
+              <th>Port</th>
+              <th>Status</th>
+              <th>Description</th>
+              <th>Last check</th>
+            </tr>
+          </thead>
+          <tbody id="services-table">
+            <tr><td colspan="6">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="tickets" class="section">
+      <div class="section-header">
+        <div>
+          <h2>Ticket Management</h2>
+          <p>Create and update internal IT tickets. Changes are written to SQLite and audit log.</p>
+        </div>
+      </div>
+
+      <form id="ticket-form" class="form-grid">
+        <input id="ticket-title" type="text" placeholder="Ticket title" required>
+        <select id="ticket-priority">
+          <option value="low">low</option>
+          <option value="medium" selected>medium</option>
+          <option value="high">high</option>
+          <option value="critical">critical</option>
+        </select>
+        <input id="ticket-assigned" type="text" placeholder="Assigned to">
+        <input id="ticket-description" type="text" placeholder="Description">
+        <button type="submit">Create ticket</button>
+      </form>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Assigned</th>
+              <th>Updated</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tickets-table">
+            <tr><td colspan="7">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="assets" class="section">
+      <div class="section-header">
+        <div>
+          <h2>Asset Inventory</h2>
+          <p>Basic company/lab asset inventory.</p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Name</th>
+              <th>Owner</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="assets-table">
+            <tr><td colspan="4">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="servers" class="section">
+      <div class="section-header">
+        <div>
+          <h2>Server Inventory</h2>
+          <p>Infrastructure nodes and virtual machines used by the lab.</p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Hostname</th>
+              <th>IP</th>
+              <th>Role</th>
+              <th>OS</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="servers-table">
+            <tr><td colspan="5">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="changes" class="section">
+      <div class="section-header">
+        <div>
+          <h2>Change Log</h2>
+          <p>Planned and completed infrastructure changes.</p>
+        </div>
+      </div>
+
+      <form id="change-form" class="form-grid">
+        <input id="change-title" type="text" placeholder="Change title" required>
+        <input id="change-service" type="text" placeholder="Service">
+        <select id="change-risk">
+          <option value="low">low</option>
+          <option value="medium" selected>medium</option>
+          <option value="high">high</option>
+        </select>
+        <select id="change-status">
+          <option value="planned" selected>planned</option>
+          <option value="in_progress">in_progress</option>
+          <option value="done">done</option>
+        </select>
+        <input id="change-description" type="text" placeholder="Description">
+        <button type="submit">Create change</button>
+      </form>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Service</th>
+              <th>Risk</th>
+              <th>Status</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody id="changes-table">
+            <tr><td colspan="6">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="audit" class="section">
+      <div class="section-header">
+        <div>
+          <h2>Audit Log</h2>
+          <p>Recent backend events and application changes.</p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Time</th>
+              <th>Event</th>
+              <th>Entity</th>
+              <th>Message</th>
+            </tr>
+          </thead>
+          <tbody id="audit-table">
+            <tr><td colspan="5">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>ZrytyBeret IT Lab</span>
+      <span id="last-refresh">Last refresh: never</span>
+    </footer>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
