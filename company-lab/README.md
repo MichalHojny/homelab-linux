@@ -40,20 +40,6 @@ Production-like two-server internal IT operations portal.
 Run on `srv-02`:
 
 ```bash
-curl -I http://localhost
-curl -s http://localhost/nginx-health
-curl -s http://localhost/api/health
-curl -s http://localhost/api/summary
-curl -I http://localhost/docs
-
-Expected result:
-
-nginx returns 200 OK
-/nginx-health returns nginx ok
-/api/health returns backend status
-/api/summary returns dashboard counters
-/docs returns FastAPI documentation
-Deployment notes
 
 Backend files live on srv-01:
 
