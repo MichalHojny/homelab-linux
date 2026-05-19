@@ -1,0 +1,39 @@
+---
+- name: Basic operations check
+  hosts: company_lab
+  gather_facts: true
+
+  tasks:
+    - name: Check uptime
+      ansible.builtin.command: uptime
+      register: uptime_result
+      changed_when: false
+
+    - name: Check root filesystem usage
+      ansible.builtin.command: df -h /
+      register: disk_result
+      changed_when: false
+
+    - name: Check listening TCP ports
+      ansible.builtin.command: ss -ltn
+      register: ports_result
+      changed_when: false
+
+    - name: Check failed systemd units
+      ansible.builtin.command: systemctl --failed --no-pager
+      register: failed_units_result
+      changed_when: false
+      failed_when: false
+
+    - name: Print operations summary
+      ansible.builtin.debug:
+        msg:
+          - "Host: {{ inventory_hostname }}"
+          - 'OS: {{ ansible_facts["distribution"] }} {{ ansible_facts["distribution_version"] }}'
+          - "Uptime: {{ uptime_result.stdout }}"
+          - "Disk:"
+          - "{{ disk_result.stdout_lines }}"
+          - "Listening TCP ports:"
+          - "{{ ports_result.stdout_lines }}"
+          - "Failed systemd units:"
+          - "{{ failed_units_result.stdout_lines }}"

@@ -1,0 +1,194 @@
+---
+- name: Common setup for company lab servers
+  hosts: company_lab
+  become: true
+  tasks:
+    - name: Install common useful packages
+      ansible.builtin.apt:
+        name:
+          - curl
+          - ca-certificates
+          - htop
+          - vim
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+
+- name: Configure srv-01 backend API
+  hosts: backend
+  become: true
+  vars:
+    backend_user: ansible
+    backend_group: ansible
+    backend_dir: /opt/company-backend
+    backend_data_dir: /var/lib/company-backend
+    backend_db_path: /var/lib/company-backend/company.db
+
+  tasks:
+    - name: Install backend system packages
+      ansible.builtin.apt:
+        name:
+          - python3
+          - python3-venv
+          - python3-pip
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Create backend application directory
+      ansible.builtin.file:
+        path: "{{ backend_dir }}"
+        state: directory
+        owner: "{{ backend_user }}"
+        group: "{{ backend_group }}"
+        mode: "0755"
+
+    - name: Create backend data directory
+      ansible.builtin.file:
+        path: "{{ backend_data_dir }}"
+        state: directory
+        owner: "{{ backend_user }}"
+        group: "{{ backend_group }}"
+        mode: "0755"
+
+    - name: Copy backend application files
+      ansible.builtin.copy:
+        src: files/backend/
+        dest: "{{ backend_dir }}/"
+        owner: "{{ backend_user }}"
+        group: "{{ backend_group }}"
+        mode: "0644"
+      notify: Restart company backend
+
+    - name: Create Python virtual environment
+      ansible.builtin.command:
+        cmd: python3 -m venv "{{ backend_dir }}/venv"
+        creates: "{{ backend_dir }}/venv/bin/python"
+      become_user: "{{ backend_user }}"
+
+    - name: Install backend Python requirements
+      ansible.builtin.pip:
+        requirements: "{{ backend_dir }}/requirements.txt"
+        virtualenv: "{{ backend_dir }}/venv"
+      become_user: "{{ backend_user }}"
+      notify: Restart company backend
+
+    - name: Initialize database if missing
+      ansible.builtin.command:
+        cmd: "{{ backend_dir }}/venv/bin/python {{ backend_dir }}/init_db.py"
+        chdir: "{{ backend_dir }}"
+        creates: "{{ backend_db_path }}"
+      become_user: "{{ backend_user }}"
+      environment:
+        DB_PATH: "{{ backend_db_path }}"
+
+    - name: Install backend systemd service
+      ansible.builtin.copy:
+        src: files/systemd/company-backend.service
+        dest: /etc/systemd/system/company-backend.service
+        owner: root
+        group: root
+        mode: "0644"
+      notify:
+        - Reload systemd
+        - Restart company backend
+
+    - name: Enable and start backend service
+      ansible.builtin.systemd:
+        name: company-backend
+        enabled: true
+        state: started
+        daemon_reload: true
+
+    - name: Wait for backend port 3000
+      ansible.builtin.wait_for:
+        host: 127.0.0.1
+        port: 3000
+        timeout: 15
+
+  handlers:
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: true
+
+    - name: Restart company backend
+      ansible.builtin.systemd:
+        name: company-backend
+        state: restarted
+
+
+- name: Configure srv-02 frontend and nginx
+  hosts: frontend
+  become: true
+  vars:
+    frontend_dir: /var/www/company-frontend
+
+  tasks:
+    - name: Install nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Create frontend directory
+      ansible.builtin.file:
+        path: "{{ frontend_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Copy frontend files
+      ansible.builtin.copy:
+        src: files/frontend/
+        dest: "{{ frontend_dir }}/"
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Install nginx site config
+      ansible.builtin.copy:
+        src: files/nginx/company-lab
+        dest: /etc/nginx/sites-available/company-lab
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Reload nginx
+
+    - name: Enable nginx site
+      ansible.builtin.file:
+        src: /etc/nginx/sites-available/company-lab
+        dest: /etc/nginx/sites-enabled/company-lab
+        state: link
+      notify: Reload nginx
+
+    - name: Remove default nginx site if present
+      ansible.builtin.file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify: Reload nginx
+
+    - name: Test nginx configuration
+      ansible.builtin.command:
+        cmd: nginx -t
+      changed_when: false
+
+    - name: Enable and start nginx
+      ansible.builtin.systemd:
+        name: nginx
+        enabled: true
+        state: started
+
+    - name: Wait for nginx port 80
+      ansible.builtin.wait_for:
+        host: 127.0.0.1
+        port: 80
+        timeout: 15
+
+  handlers:
+    - name: Reload nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded

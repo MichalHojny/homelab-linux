@@ -31,3 +31,40 @@ volumes/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Secrets / local environment
+.env
+**/.env
+*.env
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+*token*
+*secret*
+*credential*
+*credentials*
+
+# Terraform local/state files
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# VM / disk / ISO images
+*.qcow2
+*.img
+*.iso
+*.vdi
+*.vmdk
+
+# Local backups / broken temp files
+*.backup-*
+*.broken-*

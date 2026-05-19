@@ -1,0 +1,78 @@
+---
+- name: Check company lab services
+  hosts: company_lab
+  gather_facts: true
+
+  tasks:
+    - name: Show hostname
+      ansible.builtin.command: hostname
+      register: hostname_result
+      changed_when: false
+
+    - name: Show uptime
+      ansible.builtin.command: uptime
+      register: uptime_result
+      changed_when: false
+
+    - name: Print basic host info
+      ansible.builtin.debug:
+        msg:
+          - "Inventory host: {{ inventory_hostname }}"
+          - "Real hostname: {{ hostname_result.stdout }}"
+          - 'OS: {{ ansible_facts["distribution"] }} {{ ansible_facts["distribution_version"] }}'
+          - "Uptime: {{ uptime_result.stdout }}"
+
+- name: Check backend on srv-01
+  hosts: srv-01
+  gather_facts: false
+
+  tasks:
+    - name: Check company-backend systemd service
+      ansible.builtin.command: systemctl is-active company-backend
+      register: backend_service
+      changed_when: false
+      failed_when: backend_service.stdout != "active"
+
+    - name: Check backend API locally
+      ansible.builtin.uri:
+        url: http://127.0.0.1:3000/api/status
+        return_content: true
+      register: backend_api
+
+    - name: Print backend result
+      ansible.builtin.debug:
+        msg:
+          - "company-backend service: {{ backend_service.stdout }}"
+          - "backend API status: {{ backend_api.json.status }}"
+          - "backend service name: {{ backend_api.json.service }}"
+
+- name: Check frontend and reverse proxy on srv-02
+  hosts: srv-02
+  gather_facts: false
+
+  tasks:
+    - name: Check nginx systemd service
+      ansible.builtin.command: systemctl is-active nginx
+      register: nginx_service
+      changed_when: false
+      failed_when: nginx_service.stdout != "active"
+
+    - name: Check frontend locally
+      ansible.builtin.uri:
+        url: http://127.0.0.1
+        return_content: false
+      register: frontend_http
+
+    - name: Check reverse proxy API locally
+      ansible.builtin.uri:
+        url: http://127.0.0.1/api/status
+        return_content: true
+      register: proxy_api
+
+    - name: Print frontend result
+      ansible.builtin.debug:
+        msg:
+          - "nginx service: {{ nginx_service.stdout }}"
+          - "frontend HTTP code: {{ frontend_http.status }}"
+          - "reverse proxy API status: {{ proxy_api.json.status }}"
+          - "reverse proxy backend service: {{ proxy_api.json.service }}"
