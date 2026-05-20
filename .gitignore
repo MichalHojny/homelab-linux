@@ -68,3 +68,13 @@ override.tf.json
 # Local backups / broken temp files
 *.backup-*
 *.broken-*
+
+# Terraform local plans and backups
+**/tfplan
+**/*.plan
+**/*.backup.*
+**/*.bak
+
+# Broken/generated local text backups
+*.broken-*
+*.old

@@ -1,0 +1,28 @@
+#cloud-config
+hostname: ${hostname}
+manage_etc_hosts: true
+
+users:
+  - name: ${vm_user}
+    groups: sudo
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ${ssh_public_key}
+
+ssh_pwauth: false
+disable_root: true
+
+package_update: true
+packages:
+  - qemu-guest-agent
+  - openssh-server
+  - sudo
+  - curl
+  - ca-certificates
+  - python3
+
+runcmd:
+  - systemctl enable --now qemu-guest-agent
+  - systemctl enable --now ssh
