@@ -53,6 +53,8 @@ company-lab
 
 Small two-server web application lab.
 
+Includes:
+
 frontend VM with nginx
 backend VM with FastAPI
 SQLite database
@@ -119,7 +121,3 @@ It shows practical work with Linux, networking, containers, virtual machines, mo
 Security note
 
 No real passwords, tokens, private keys, WireGuard configs, .env files or private tracker data should be committed.
-
-## Homelab projects
-
-- [Torrent stack](homelab/torrent-stack/README.md)
