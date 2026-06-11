@@ -35,89 +35,96 @@ This repository documents my hands-on learning path toward Junior Linux Administ
 
 ## Current lab structure
 
-```text
 Arch Linux host
-├── Docker services
-│   ├── monitoring stack
-│   ├── Guacamole
-│   ├── Jellyfin
-│   └── VPN-isolated torrent clients
-├── KVM/libvirt VMs
-│   ├── Ubuntu / Debian servers
-│   ├── K3s lab
-│   └── security lab VMs
-├── nginx reverse proxy
-└── Cloudflare Tunnel
-Selected projects
-company-lab
+
+- Docker services
+  - monitoring stack
+  - Guacamole
+  - Jellyfin
+  - VPN-isolated torrent clients
+- KVM/libvirt VMs
+  - Ubuntu / Debian servers
+  - K3s lab
+  - security lab VMs
+- nginx reverse proxy
+- Cloudflare Tunnel
+
+## Selected projects
+
+### company-lab
 
 Small two-server web application lab.
 
 Includes:
 
-frontend VM with nginx
-backend VM with FastAPI
-SQLite database
-systemd service
-Ansible deployment
+- frontend VM with nginx
+- backend VM with FastAPI
+- SQLite database
+- systemd service
+- Ansible deployment
 
-Path:
+Paths:
 
-company-lab/
-homelab/ansible/
-Terraform libvirt lab
+- company-lab/
+- homelab/ansible/
+
+### Terraform libvirt lab
 
 Repeatable VM provisioning with Terraform and libvirt.
 
 Includes:
 
-cloud-init
-static VM IPs
-SSH user injection
-Ubuntu cloud images
-Terraform apply/destroy workflow
+- cloud-init
+- static VM IPs
+- SSH user injection
+- Ubuntu cloud images
+- Terraform apply/destroy workflow
 
 Path:
 
-homelab/terraform/libvirt-company-lab/
-Monitoring stack
+- homelab/terraform/libvirt-company-lab/
+
+### Monitoring stack
 
 Docker-based monitoring and logging.
 
 Includes:
 
-Prometheus
-Grafana
-Loki
-Promtail
-node-exporter
-cAdvisor
-K3s lab
+- Prometheus
+- Grafana
+- Loki
+- Promtail
+- node-exporter
+- cAdvisor
+
+### K3s lab
 
 Single-node Kubernetes lab used to practice:
 
-namespaces
-deployments
-pods
-services
-port-forwarding
-Troubleshooting examples
+- namespaces
+- deployments
+- pods
+- services
+- port-forwarding
+
+## Troubleshooting examples
 
 Real problems solved in this lab:
 
-VM DNS blocked by firewall on libvirt bridge
-Docker container path and permission issues
-rTorrent/Deluge VPN port forwarding issues
-Gluetun Proton WireGuard endpoint testing
-nginx and Cloudflare Tunnel routing
-K3s service and pod checks
-storage cleanup and VM disk analysis
-Why this repo exists
+- VM DNS blocked by firewall on libvirt bridge
+- Docker container path and permission issues
+- rTorrent and Deluge VPN port forwarding issues
+- Gluetun Proton WireGuard endpoint testing
+- nginx and Cloudflare Tunnel routing
+- K3s service and pod checks
+- storage cleanup and VM disk analysis
+
+## Why this repo exists
 
 This is my public technical portfolio.
 
 It shows practical work with Linux, networking, containers, virtual machines, monitoring and troubleshooting instead of only theory.
 
-Security note
+## Security note
 
 No real passwords, tokens, private keys, WireGuard configs, .env files or private tracker data should be committed.
