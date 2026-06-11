@@ -119,3 +119,7 @@ It shows practical work with Linux, networking, containers, virtual machines, mo
 Security note
 
 No real passwords, tokens, private keys, WireGuard configs, .env files or private tracker data should be committed.
+
+## Homelab projects
+
+- [Torrent stack](homelab/torrent-stack/README.md)
